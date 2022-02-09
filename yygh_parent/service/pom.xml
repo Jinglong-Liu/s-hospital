@@ -25,12 +25,12 @@
             <artifactId>model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <!--
+
         <dependency>
             <groupId>com.exp</groupId>
             <artifactId>service_util</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>-->
+        </dependency>
         <!--web-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
