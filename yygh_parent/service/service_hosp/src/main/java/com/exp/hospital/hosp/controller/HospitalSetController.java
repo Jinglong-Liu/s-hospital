@@ -7,6 +7,7 @@ import com.exp.hospital.common.util.MD5;
 import com.exp.hospital.hosp.service.HospitalSetService;
 import com.exp.hospital.model.hosp.HospitalSet;
 import com.exp.hospital.vo.hosp.HospitalSetQueryVo;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -86,6 +87,25 @@ public class HospitalSetController {
             return Result.fail();
         }
     }
-    // get by id
-    //
+    // 5、根据id获取医院设置
+    @GetMapping("getHospSet/{id}")
+    public Result getHospSet(@PathVariable Long id){
+        HospitalSet hospitalSet = hospitalSetService.getById(id);
+        return Result.ok(hospitalSet);
+    }
+    //6、修改医院设置
+    @PostMapping("updateHospitalSet")
+    public Result updateHospitalSet(@RequestBody HospitalSet hospitalSet){
+        boolean flag = hospitalSetService.updateById(hospitalSet);
+        if(flag){
+            return Result.ok();
+        }
+        return Result.fail();
+    }
+    //7、批量删除医院设置
+    @DeleteMapping("batchRemove")
+    public Result batchRemoveHospitalSet(@RequestBody List<Long> idList){
+        hospitalSetService.removeByIds(idList);
+        return Result.ok();
+    }
 }
