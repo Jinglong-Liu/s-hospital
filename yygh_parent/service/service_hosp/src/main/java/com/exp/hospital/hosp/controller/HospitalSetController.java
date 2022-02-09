@@ -17,6 +17,7 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/admin/hosp/hospitalSet")
+@CrossOrigin
 public class HospitalSetController {
 
     @Autowired
@@ -58,13 +59,14 @@ public class HospitalSetController {
         Page<HospitalSet>page = new Page<>(current,limit);
         //构建条件
         QueryWrapper<HospitalSet>wrapper = new QueryWrapper<>();
-        String hosname = hospitalSetQueryVo.getHosname().trim();
-        String hoscode = hospitalSetQueryVo.getHoscode().trim();
+
+        String hosname = hospitalSetQueryVo.getHosname();
+        String hoscode = hospitalSetQueryVo.getHoscode();
         if(!StringUtils.isEmpty(hosname)){
-            wrapper.like("hosname",hosname);
+            wrapper.like("hosname",hosname.trim());
         }
         if(!StringUtils.isEmpty(hoscode)){
-            wrapper.eq("hoscode",hoscode);
+            wrapper.eq("hoscode",hoscode.trim());
         }
 
         Page<HospitalSet> hospitalSetPage = hospitalSetService.page(page, wrapper);
