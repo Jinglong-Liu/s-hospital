@@ -7,6 +7,7 @@ import com.exp.hospital.common.result.ResultCodeEnum;
 import com.exp.hospital.common.util.MD5;
 import com.exp.hospital.hosp.service.HospitalService;
 import com.exp.hospital.hosp.service.HospitalSetService;
+import com.exp.hospital.model.hosp.Hospital;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,5 +48,27 @@ public class ApiController {
         paramMap.put("logoData",logoData);
         hospitalService.save(paramMap);
         return Result.ok();
+    }
+
+    // 查询医院
+    @PostMapping("hospital/show")
+    public Result getHospital(HttpServletRequest request){
+        Map<String, String[]> requestMap = request.getParameterMap();
+        Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
+        // 获取编号
+        String hoscode = (String) paramMap.get("hoscode");
+        // 获取签名（加密的）
+        String hospSign = (String)paramMap.get("sign");
+        // 查询数据库对比，查询签名
+        String signKey = hospitalSetService.getSignKey(hoscode);
+        // 加密数据库查到的密码对比
+        String signKeyMd5 = MD5.encrypt(signKey);
+        // 判断是否一致
+        if(!hospSign.equals(signKeyMd5)){
+            throw new HospitalException(ResultCodeEnum.SIGN_ERROR);
+        }
+        // 调用service 查询
+        Hospital hospital = hospitalService.getByHoscode(hoscode);
+        return Result.ok(hospital);
     }
 }
