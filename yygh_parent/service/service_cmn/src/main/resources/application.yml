@@ -16,5 +16,14 @@ spring:
     url: jdbc:mysql://localhost:3306/yygh_cmn?characterEncoding=utf-8&useSSL=false
     username: root
     password: 1234
-
-
+  redis:
+    host: 192.168.5.46
+    port: 6379
+    database: 0
+    timeout: 1800000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: 1
+        max-idle: 5
+        min-idle: 0
