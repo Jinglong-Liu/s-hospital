@@ -42,6 +42,9 @@ public class ApiController {
         if(!hospSign.equals(signKeyMd5)){
             throw new HospitalException(ResultCodeEnum.SIGN_ERROR);
         }
+        // 图片处理：+ 号会变成空格,需要把空格转+
+        String logoData = ((String) paramMap.get("logoData")).replaceAll(" ","+");
+        paramMap.put("logoData",logoData);
         hospitalService.save(paramMap);
         return Result.ok();
     }
