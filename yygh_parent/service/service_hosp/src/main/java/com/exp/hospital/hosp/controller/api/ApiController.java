@@ -23,12 +23,25 @@ import java.util.Map;
 public class ApiController {
     @Autowired
     private HospitalService hospitalService;
+    @Autowired
+    private HospitalSetService hospitalSetService;
     //1、上传医院接口
     @PostMapping("saveHospital")
     public Result saveHosp(HttpServletRequest request){
         // 获取传递过来的信息
         Map<String, String[]> requestMap = request.getParameterMap();
         Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
+        // 获取签名（加密的）
+        String hospSign = (String)paramMap.get("sign");
+        // 查询数据库对比，查询签名
+        String hoscode = (String) paramMap.get("hoscode");
+        String signKey = hospitalSetService.getSignKey(hoscode);
+        // 加密数据库查到的密码对比
+        String signKeyMd5 = MD5.encrypt(signKey);
+        // 判断是否一致
+        if(!hospSign.equals(signKeyMd5)){
+            throw new HospitalException(ResultCodeEnum.SIGN_ERROR);
+        }
         hospitalService.save(paramMap);
         return Result.ok();
     }
