@@ -61,4 +61,14 @@ public class DictController {
         String dictName = dictService.getDictName("",value);
         return Result.ok(dictName);
     }
+
+    /**
+     * 根据dict_code查下一级
+     */
+    @ApiOperation("根据dictCode查下级结点")
+    @GetMapping("/findByDictCode/{dictCode}")
+    public Result findByDictCode(@PathVariable String dictCode){
+        List<Dict> list = dictService.findByDictCode(dictCode);
+        return Result.ok(list);
+    }
 }
