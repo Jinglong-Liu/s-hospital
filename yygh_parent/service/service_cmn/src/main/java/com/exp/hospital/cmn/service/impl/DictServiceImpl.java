@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -79,6 +80,30 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
         }
     }
 
+    @Override
+    public String getDictName(String dictCode, String value) {
+        // 如果dictCode 为空,直接根据value查询
+        if(StringUtils.isEmpty(dictCode)) {
+            QueryWrapper<Dict>wrapper = new QueryWrapper<>();
+            wrapper.eq("value",value);
+            Dict dict = baseMapper.selectOne(wrapper);
+            return dict.getName();
+        } else {
+            System.out.println(dictCode);
+            Dict codeDict = this.getDictByDictCode(dictCode);
+            Long parentId = codeDict.getId();
+            Dict dict = baseMapper.selectOne(new QueryWrapper<Dict>()
+                    .eq("parent_id", parentId)
+                    .eq("value", value));
+            return dict.getName();
+        }
+    }
+    private Dict getDictByDictCode(String dictCode){
+        QueryWrapper<Dict>wrapper = new QueryWrapper<>();
+        wrapper.eq("dict_code",dictCode);
+        Dict dict = baseMapper.selectOne(wrapper);
+        return dict;
+    }
     //判断id是否有子节点
     private boolean hasChildren(Long id){
         QueryWrapper<Dict>wrapper = new QueryWrapper<>();
