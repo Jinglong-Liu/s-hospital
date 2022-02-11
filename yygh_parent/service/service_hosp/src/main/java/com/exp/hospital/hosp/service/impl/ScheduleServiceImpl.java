@@ -116,7 +116,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 Aggregation.match(criteria),
                 Aggregation.group("workDate")
         );
-        AggregationResults<BookingScheduleRuleVo> totalAggResult = mongoTemplate.aggregate(aggregation, Schedule.class, BookingScheduleRuleVo.class);
+        AggregationResults<BookingScheduleRuleVo> totalAggResult = mongoTemplate.aggregate(totalAgg, Schedule.class, BookingScheduleRuleVo.class);
         int total = totalAggResult.getMappedResults().size();
 
         // 获取日期对应的星期
