@@ -8,13 +8,14 @@ import com.exp.hospital.common.util.MD5;
 import com.exp.hospital.hosp.service.DepartmentService;
 import com.exp.hospital.hosp.service.HospitalService;
 import com.exp.hospital.hosp.service.HospitalSetService;
+import com.exp.hospital.model.hosp.Department;
 import com.exp.hospital.model.hosp.Hospital;
+import com.exp.hospital.vo.hosp.DepartmentQueryVo;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -60,16 +61,7 @@ public class ApiController {
         Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
         // 获取编号
         String hoscode = (String) paramMap.get("hoscode");
-        // 获取签名（加密的）
-        String hospSign = (String)paramMap.get("sign");
-        // 查询数据库对比，查询签名
-        String signKey = hospitalSetService.getSignKey(hoscode);
-        // 加密数据库查到的密码对比
-        String signKeyMd5 = MD5.encrypt(signKey);
-        // 判断是否一致
-        if(!hospSign.equals(signKeyMd5)){
-            throw new HospitalException(ResultCodeEnum.SIGN_ERROR);
-        }
+        checkSign(paramMap);
         // 调用service 查询
         Hospital hospital = hospitalService.getByHoscode(hoscode);
         return Result.ok(hospital);
@@ -82,7 +74,37 @@ public class ApiController {
         Map<String, String[]> requestMap = request.getParameterMap();
         Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
 
+        checkSign(paramMap);
 
+        departmentService.save(paramMap);
+        return Result.ok();
+    }
+
+    // 查询科室
+    @PostMapping("department/list")
+    public Result findDepartment(HttpServletRequest request){
+        // 获取传递过来的信息
+        Map<String, String[]> requestMap = request.getParameterMap();
+        Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
+        // 获取医院编号
+        //医院编号
+        String hoscode = (String)paramMap.get("hoscode");
+
+        //当前页 和 每页记录数
+        int pageNum = StringUtils.isEmpty(paramMap.get("page")) ? 1 : Integer.parseInt((String)paramMap.get("page"));
+        int limit = StringUtils.isEmpty(paramMap.get("limit")) ? 1 : Integer.parseInt((String)paramMap.get("limit"));
+
+        // TODO:签名校验
+        checkSign(paramMap);
+
+        //
+        DepartmentQueryVo departmentQueryVo = new DepartmentQueryVo();
+        departmentQueryVo.setHoscode(hoscode);
+        //调用service
+        Page<Department> pageModel = departmentService.findPageDepartment(pageNum,limit,departmentQueryVo);
+        return Result.ok(pageModel);
+    }
+    private void checkSign( Map<String, Object> paramMap){
         // 获取签名（加密的）
         String hospSign = (String)paramMap.get("sign");
         // 查询数据库对比，查询签名
@@ -94,8 +116,17 @@ public class ApiController {
         if(!hospSign.equals(signKeyMd5)){
             throw new HospitalException(ResultCodeEnum.SIGN_ERROR);
         }
-
-        departmentService.save(paramMap);
+    }
+    // 删除科室
+    @PostMapping("department/remove")
+    public Result removeDepartment(HttpServletRequest request){
+        Map<String, String[]> requestMap = request.getParameterMap();
+        Map<String, Object> paramMap = HttpRequestHelper.switchMap(requestMap);
+        checkSign(paramMap);
+        String hoscode = (String) paramMap.get("hoscode");
+        String depcode = (String) paramMap.get("depcode");
+        checkSign(paramMap);
+        departmentService.remove(hoscode,depcode);
         return Result.ok();
     }
 }
