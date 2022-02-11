@@ -89,7 +89,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             Dict dict = baseMapper.selectOne(wrapper);
             return dict.getName();
         } else {
-            System.out.println(dictCode);
+            //System.out.println(dictCode);
             Dict codeDict = this.getDictByDictCode(dictCode);
             Long parentId = codeDict.getId();
             Dict dict = baseMapper.selectOne(new QueryWrapper<Dict>()
