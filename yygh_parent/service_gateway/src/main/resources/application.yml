@@ -1,0 +1,36 @@
+server:
+  port: 80
+#logging:
+#  level:
+#    root: debug
+
+spring:
+  application:
+    name: service-gateway
+#  profiles:
+#    active: dev
+#  jackson:
+#    date-format: yyyy-MM-dd HH:mm:ss
+#    time-zone: GMT+8
+
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: service-hosp
+          uri: lb://service-hosp
+          # 路由断言 * 一层目录，** 多层
+          predicates:
+            - Path=/*/hosp/**
+
+        - id: service-cmn
+          uri: lb://service-cmn
+          predicates:
+            - Path=/*/cmn/**
+

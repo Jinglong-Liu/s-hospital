@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/api/hosp")
 public class ApiController {
     @Autowired
